@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Information Registration</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      /* 左右镜像渐变背景 */
+      background: linear-gradient(45deg, #6a11cb, #2575fc);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    input, button {
+      width: 100%;
+      max-width: 300px;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    input {
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: linear-gradient(90deg, #6a11cb, #2575fc);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    /* 成功弹窗 */
+    .success-popup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: #6a11cb;
+      color: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 16px;
+      opacity: 0;
+      z-index: 10;
+      pointer-events: none;
+      animation: none;
+    }
+
+    @keyframes popupAnimation {
+      0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 1;
+      }
+      70% {
+        transform: translate(-50%, -50%) scale(0.95);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    .success-popup.show {
+      animation: popupAnimation 0.6s forwards;
+    }
+
+    .success-popup.fadeout {
+      transition: opacity 0.5s ease;
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Please fill in your information</h2>
+    <form id="clientForm">
+      <input type="text" name="name" placeholder="Full Name" required>
+      <input type="text" name="company" placeholder="Company Name" required>
+      <input type="tel" name="phone" placeholder="Phone Number" required>
+      <input type="email" name="email" placeholder="Email Address" required>
+      <button type="submit">Submit</button>
+    </form>
+
+    <div class="success-popup" id="successPopup">Submission Successful!</div>
+  </div>
+
+  <script>
+    const form = document.getElementById("clientForm");
+    const popup = document.getElementById("successPopup");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = {
+        name: formData.get("name"),
+        company: formData.get("company"),
+        phone: formData.get("phone"),
+        email: formData.get("email")
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbxoP20P6f_aDS2oKhZijVtU5k80Ca9kQSCLxVLObtUeHYY7y42izsGKa8V2icIn2nY/exec", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(res => res.text())
+      .then(res => {
+        if(res === "OK"){
+          // 显示提交成功动画
+          popup.classList.add("show");
+
+          // 1.5秒后开始渐隐
+          setTimeout(() => {
+            popup.classList.add("fadeout");
+          }, 1500);
+
+          // 2秒后跳转到 thankyou.html
+          setTimeout(() => {
+            window.location.href = "thankyou.html";
+          }, 2000);
+
+        } else {
+          alert("Submission failed, please try again.");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Network error, please try later.");
+      });
+    });
+  </script>
+</body>
+</html>
